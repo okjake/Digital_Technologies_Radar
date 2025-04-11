@@ -21,6 +21,7 @@ import { RadarContext } from 'navigation/context';
 import './FilterComponent.scss';
 import './Filter.scss';
 import { initialParameterCount } from '../helpers/HelperUtils';
+import { useLocationHierarchy } from '../../../providers/LocationHierarchyProvider';
 
 interface Labels {
   status: string[];
@@ -61,13 +62,15 @@ export const FilterComponent: React.FC<Props> = ({
   setProjects = () => {},
   setTotalFiltersCount = () => {}
 }) => {
+  const { getPermittedCountries, getPermittedSubregions } =
+    useLocationHierarchy();
+
   const {
     state: {
       blips,
       radarData: { tech }
     }
   } = useRadarState();
-
   const { header, status } = config;
 
   const {
@@ -118,9 +121,18 @@ export const FilterComponent: React.FC<Props> = ({
       setLabels(updatedLabels);
       setInitialFilteredValues(updatedLabels);
     }
+
     const regions = FilterUtils.getRegions(blips, regionKey);
-    const subregions = FilterUtils.getSubregions(blips, subregionKey);
-    const countries = FilterUtils.getCountries(blips, countryKey);
+    const subregions = FilterUtils.getSubregions(
+      blips,
+      subregionKey,
+      getPermittedSubregions()
+    );
+    const countries = FilterUtils.getCountries(
+      blips,
+      countryKey,
+      getPermittedCountries()
+    );
     const disasterTypes = FilterUtils.getDisasterTypes(blips, disasterKey);
     const useCases = FilterUtils.getUseCases(blips, useCaseKey);
     const implementers = FilterUtils.getImplementers(blips, implementerKey);
@@ -163,7 +175,11 @@ export const FilterComponent: React.FC<Props> = ({
     };
 
     setOptions(options);
-  }, [tech]);
+  }, [
+    tech,
+    filteredValues.parameters['Region']?.length,
+    filteredValues.parameters['Sub Region']?.length
+  ]);
 
   const setInitialFilteredValues = (currentLabels: any): void => {
     const filterValues: any = {

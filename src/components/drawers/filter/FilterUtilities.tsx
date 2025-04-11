@@ -11,19 +11,22 @@ import {
 
 const getSubregions = (
   rawBlipData: BlipType[],
-  regionKey: string
+  subregionKey: string,
+  permitted?: string[]
 ): SelectableItem[] => {
   const newSubregions: Map<string, SelectableItem> = new Map();
   rawBlipData.forEach((val) => {
-    const blipRegions: Set<string> = new Set(val[regionKey]);
-    blipRegions.delete('');
+    const blipSubregions: Set<string> = new Set(val[subregionKey]);
+    blipSubregions.delete('');
 
-    blipRegions.forEach((region) => {
-      // @ts-expect-error
-      newSubregions.set(region, { uuid: uuidv4(), name: region, raw: val });
+    blipSubregions.forEach((subregion) => {
+      if (permitted && !permitted.includes(subregion)) {
+        return;
+      }
+
+      newSubregions.set(subregion, { uuid: uuidv4(), name: subregion });
     });
   });
-
   return Array.from(newSubregions.values()).sort((a, b) =>
     a.name.localeCompare(b.name)
   );
@@ -50,7 +53,8 @@ const getRegions = (
 
 const getCountries = (
   rawBlipData: BlipType[],
-  countryKey: string
+  countryKey: string,
+  permitted?: string[]
 ): SelectableItem[] => {
   const newCountries: Map<string, SelectableItem> = new Map();
   rawBlipData.forEach((val) => {
@@ -58,6 +62,9 @@ const getCountries = (
     blipCountries.delete('');
 
     blipCountries.forEach((country) => {
+      if (permitted && !permitted.includes(country)) {
+        return;
+      }
       newCountries.set(country, { uuid: uuidv4(), name: country });
     });
   });

@@ -44,6 +44,7 @@ import { initialParameterCount } from 'components/shared/helpers/HelperUtils';
 
 // Context
 import { RadarContext, RadarContextInterface } from './context';
+import { LocationHierarchyProvider } from '../providers/LocationHierarchyProvider';
 
 // Styles
 import './AppNav.scss';
@@ -99,129 +100,70 @@ export const NavApp: React.FC = () => {
   };
   return (
     <RadarContext.Provider value={radarContext}>
-      <Flex className='navApp'>
-        <AppLeftNav />
-        <AppBottomNav />
-        <AppMobileHeader />
-        <MainLayout>
-          <Routes>
-            <Route path={ROUTES.HOME} element={<HomePage />} />
-            <Route path={ROUTES.PROJECTS_RADAR} element={<ProjectsRadar />} />
-            <Route path={ROUTES.RADAR} element={<RadarLayout />}>
-              <Route path={ROUTES.QUADRANT}>
+      <LocationHierarchyProvider>
+        <Flex className='navApp'>
+          <AppLeftNav />
+          <AppBottomNav />
+          <AppMobileHeader />
+          <MainLayout>
+            <Routes>
+              <Route path={ROUTES.HOME} element={<HomePage />} />
+              <Route path={ROUTES.PROJECTS_RADAR} element={<ProjectsRadar />} />
+              <Route path={ROUTES.RADAR} element={<RadarLayout />}>
+                <Route path={ROUTES.QUADRANT}>
+                  <Route
+                    path={ROUTES.QUADRANT_PARAM}
+                    element={<QuadrantView />}
+                  />
+                </Route>
+                <Route path={''} element={<RadarComponent />}></Route>
+              </Route>
+              <Route path={ROUTES.MAP_VIEW} element={<MapViewLayout />}>
+                <Route path={''} element={<RadarMapView />}></Route>
+              </Route>
+              <Route path={ROUTES.PROJECTS} element={<Outlet />}>
+                <Route index element={<Projects />} />
                 <Route
-                  path={ROUTES.QUADRANT_PARAM}
-                  element={<QuadrantView />}
+                  path={`${ROUTES.NEW}`}
+                  element={<ProjectAction mode='add' />}
+                />
+                <Route path={`${ROUTES.REVIEW}`} element={<ReviewProjects />} />
+
+                <Route path=':project_id' element={<ProjectDetails />} />
+                <Route
+                  path={`:project_id/${ROUTES.EDIT}`}
+                  element={<ProjectAction mode='edit' />}
                 />
               </Route>
-              <Route path={''} element={<RadarComponent />}></Route>
-            </Route>
-            <Route path={ROUTES.MAP_VIEW} element={<MapViewLayout />}>
-              <Route path={''} element={<RadarMapView />}></Route>
-            </Route>
-            <Route path={ROUTES.PROJECTS} element={<Outlet />}>
-              <Route index element={<Projects />} />
-              <Route
-                path={`${ROUTES.NEW}`}
-                element={<ProjectAction mode='add' />}
-              />
-              <Route path={`${ROUTES.REVIEW}`} element={<ReviewProjects />} />
-
-              <Route path=':project_id' element={<ProjectDetails />} />
-              <Route
-                path={`:project_id/${ROUTES.EDIT}`}
-                element={<ProjectAction mode='edit' />}
-              />
-            </Route>
-
-            <Route path={ROUTES.DISASTERS} element={<Outlet />}>
-              <Route index element={<Disasters />} />
-              <Route
-                path={`${ROUTES.NEW}`}
-                element={
-                  <InfoAction
-                    mode='ADD'
-                    category='DISASTER'
-                    table='disaster_types'
-                  />
-                }
-              />
-              <Route
-                path={`:id`}
-                element={
-                  <InfoDetails
-                    tableName='disaster_types'
-                    relation='disaster_types_projects'
-                  />
-                }
-              />
-              <Route
-                path={`:id/${ROUTES.EDIT}`}
-                element={
-                  <InfoAction
-                    mode='EDIT'
-                    category='DISASTER'
-                    table='disaster_types'
-                  />
-                }
-              />
-            </Route>
-            <Route path={ROUTES.DISASTER_EVENTS} element={<Outlet />}>
-              <Route index element={<DisasterEvents />} />
-              <Route path=':eventId' element={<DisasterEvent />} />
-              <Route
-                path={`${ROUTES.NEW}`}
-                element={<EventAction mode='Add' />}
-              />
-              <Route
-                path={`:eventId/${ROUTES.EDIT}`}
-                element={<EventAction mode='Edit' />}
-              />
-            </Route>
-
-            <Route path={ROUTES.TECHNOLOGIES} element={<Outlet />}>
-              <Route index element={<Technologies />} />
-              <Route
-                path={`${ROUTES.NEW}`}
-                element={
-                  <InfoAction
-                    mode='ADD'
-                    category='TECHNOLOGY'
-                    table='technologies'
-                  />
-                }
-              />
-              <Route
-                path={`:id`}
-                element={
-                  <InfoDetails
-                    tableName='technologies'
-                    relation='tech_projects'
-                  />
-                }
-              />
-              <Route
-                path={`:id/${ROUTES.EDIT}`}
-                element={
-                  <InfoAction
-                    mode='EDIT'
-                    category='TECHNOLOGY'
-                    table='technologies'
-                  />
-                }
-              />
-            </Route>
-            <Route path={ROUTES.ABOUT} element={<About />} />
-            <Route path={ROUTES.SEARCH} element={<Search />} />
-            <Route path={ROUTES.VOLUNTEERS} element={<Volunteers />} />
-            <Route path={ROUTES.SIGN_IN} element={<SignIn />} />
-            <Route path={ROUTES.REGISTER} element={<Register />} />
-
-            <Route path='/' element={<Navigate replace to={ROUTES.RADAR} />} />
-            <Route path='*' element={<NotFound404 />} />
-          </Routes>
-        </MainLayout>
-      </Flex>
+              <Route path={ROUTES.DISASTERS} element={<Outlet />}>
+                <Route index element={<Disasters />} />
+                <Route path={`${ROUTES.NEW}`} element={<EventAction />} />
+                <Route path=':disaster_id' element={<DisasterEvent />} />
+                <Route
+                  path={`:disaster_id/${ROUTES.EDIT}`}
+                  element={<EventAction />}
+                />
+              </Route>
+              <Route path={ROUTES.INFO} element={<Outlet />}>
+                <Route index element={<InfoDetails />} />
+                <Route path={`${ROUTES.NEW}`} element={<InfoAction />} />
+                <Route path=':info_id' element={<InfoDetails />} />
+                <Route
+                  path={`:info_id/${ROUTES.EDIT}`}
+                  element={<InfoAction />}
+                />
+              </Route>
+              <Route path={ROUTES.SEARCH} element={<Search />} />
+              <Route path={ROUTES.TECHNOLOGIES} element={<Technologies />} />
+              <Route path={ROUTES.VOLUNTEERS} element={<Volunteers />} />
+              <Route path={ROUTES.ABOUT} element={<About />} />
+              <Route path={ROUTES.SIGN_IN} element={<SignIn />} />
+              <Route path={ROUTES.REGISTER} element={<Register />} />
+              <Route path='*' element={<NotFound404 />} />
+            </Routes>
+          </MainLayout>
+        </Flex>
+      </LocationHierarchyProvider>
     </RadarContext.Provider>
   );
 };
