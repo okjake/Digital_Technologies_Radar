@@ -1,6 +1,6 @@
 import { Flex } from '@chakra-ui/react';
 import { useState } from 'react';
-import { Navigate, Outlet, Route, Routes } from 'react-router-dom';
+import { Outlet, Route, Routes } from 'react-router-dom';
 
 import { ROUTES } from './routes';
 // Components
@@ -27,7 +27,6 @@ import {
   DisasterEvent,
   InfoAction,
   EventAction,
-  DisasterEvents,
   SignIn,
   ReviewProjects,
   Register
